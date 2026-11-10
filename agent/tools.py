@@ -3,6 +3,7 @@
 import ast
 import operator
 import os
+import re
 
 NOTES_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "notes")
 
@@ -49,13 +50,17 @@ def read_note(name):
         return f.read()[:2000]
 
 
+STOP_WORDS = {"the", "and", "for", "when", "what", "where", "who", "how", "is", "are", "was", "my", "our"}
+
+
 def search_notes(query):
-    words = [w.lower() for w in query.split() if len(w) > 2]
+    words = [w for w in re.findall(r"[a-z0-9]+", query.lower()) if len(w) > 2 and w not in STOP_WORDS]
     hits = []
     for name in sorted(os.listdir(NOTES_DIR)):
         with open(os.path.join(NOTES_DIR, name), encoding="utf-8") as f:
             text = f.read()
-        score = sum(text.lower().count(w) for w in words)
+        note_words = re.findall(r"[a-z0-9]+", text.lower())
+        score = sum(note_words.count(w) for w in words)
         if score:
             hits.append((score, name, text.strip()[:120]))
     hits.sort(reverse=True)

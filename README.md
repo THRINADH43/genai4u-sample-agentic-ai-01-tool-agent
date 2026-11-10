@@ -11,12 +11,14 @@ GROQ_API_KEY=... python main.py "What is 15% of 2400?"    # real model on Groq (
 python -m unittest discover -s tests -t .
 ```
 
-The key is read from the environment and never stored in the code.
+The key is read from `GROQ_API_KEY` (see `.env.example`) and never stored in the code.
+`requirements.txt` is empty: only the standard library is used. The notes are `.md` files in
+`notes/`.
 
 Example with Groq:
 
 ```
-step 1: search_notes({"query": "demo"}) -> 'deadlines.txt: Project deadline: 15 December. Demo to the client on 18 December.'
+step 1: search_notes({"query": "demo"}) -> 'deadlines.md: Project deadline: 15 December. Demo to the client on 18 December.'
 step 2: answer
 The demo to the client is on 18 December.
 ```
@@ -37,7 +39,8 @@ The demo to the client is on 18 December.
 | `read_note` | `name` | only files inside `notes/`; `../` and absolute paths are refused |
 | `search_notes` | `query` | top 3 notes by word count |
 
-Each tool has a JSON Schema. `validate()` checks every call before it runs: the tool exists,
+Each tool has a JSON Schema, and the schemas are sent to the model as tool definitions
+(`schemas_for_model`). `validate()` checks every call before it runs: the tool exists,
 arguments are an object, required keys are present, no extra keys, strings are strings and
 not too long. A bad call does not crash the agent: the error goes back to the model as the
 tool result so it can try again.

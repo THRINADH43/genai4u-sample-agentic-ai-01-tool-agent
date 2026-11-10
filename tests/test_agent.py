@@ -20,13 +20,14 @@ class ToolTests(unittest.TestCase):
                 calculator(bad)
 
     def test_read_note_stays_in_folder(self):
-        self.assertIn("Monday", read_note("meetings.txt"))
-        for bad in ["../README.md", "/etc/passwd", "missing.txt"]:
+        self.assertIn("Monday", read_note("meetings.md"))
+        for bad in ["../README.md", "/etc/passwd", "missing.md"]:
             with self.assertRaises(ToolError):
                 read_note(bad)
 
     def test_search_notes(self):
-        self.assertTrue(search_notes("deadline demo").startswith("deadlines.txt"))
+        self.assertTrue(search_notes("deadline demo").startswith("deadlines.md"))
+        self.assertTrue(search_notes("When is the demo?").startswith("deadlines.md"))  # punctuation, stop words
 
     def test_validation(self):
         with self.assertRaises(ToolError):
@@ -61,7 +62,7 @@ class LoopTests(unittest.TestCase):
 
     def test_multi_tool_question(self):
         model = FakeModel([{"tool": "search_notes", "args": {"query": "demo"}},
-                           {"tool": "read_note", "args": {"name": "deadlines.txt"}},
+                           {"tool": "read_note", "args": {"name": "deadlines.md"}},
                            {"answer": "The demo is on 18 December."}])
         self.assertIn("18 December", run_agent("When is the demo?", model, log=quiet))
 
